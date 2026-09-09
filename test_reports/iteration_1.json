@@ -1,0 +1,37 @@
+{
+  "summary": "First round of full-stack testing for SweetOClock (mock mode). Backend: 16/16 pytest tests passed (products, guest checkout create+verify with mock signature, invoice PDF, tracking, admin auth cookie/Bearer, order status update, mock Shiprocket AWB, resend invoice, product CRUD, admin auth guard). Frontend: storefront loads with 2 seeded products and weight chips, cart drawer works, guest checkout auto-verifies in mock mode and lands on /order-success/<id> showing SOC-XXXXXX order number and Download Invoice button, Track Order timeline renders 'paid' step for placed order, admin login guards /admin (redirects when unauthenticated), wrong password stays on login, correct login shows Orders/Products tabs, product create via UI works and appears on storefront, admin Shiprocket push generates MOCK AWB and updates shipment cell. Mobile 390x844 renders storefront but has a small (~8px) horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Storefront (mobile)", "issue": "Horizontal overflow ~8px at viewport 390 (scrollWidth=398). Something inside hero/product grid exceeds container width.", "selector": "root layout", "priority": "LOW"},
+      {"component": "Checkout order summary / OrderSuccess / Admin orders table", "issue": "Total is displayed as rounded integer (e.g. ₹300) while backend stores/charges the exact amount (299.5 for 500g x1 Laddoo). Invoice PDF also shows exact figure. Cosmetic inconsistency between UI display and actual charged amount.", "selector": "order-summary total, order-success total", "priority": "LOW"},
+      {"component": "Checkout.jsx", "issue": "React warning: 'Each child in a list should have a unique key prop' when rendering cart lines. Add stable key on the map (e.g., `${product_id}-${weight_grams}`).", "selector": "Checkout list render", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix mobile horizontal overflow on storefront (~8px) — likely a hero/section max-width or image causing overflow at 390px.",
+    "Align UI total display with backend total (either display as ₹299.50 with two decimals or round backend total to nearest rupee) so admin, checkout, order-success and invoice all match.",
+    "Add unique `key` prop to cart-item list in Checkout.jsx to silence React warning."
+  ],
+  "critical_code_review_comments": [
+    "server.py: /orders/verify does not enforce that razorpay_order_id in request matches stored order['payment']['razorpay_order_id'] in mock mode; ok in real mode via signature check but consider validating in both paths.",
+    "server.py: Shiprocket push allows re-push if status is not 'created', but if status is 'paid'/'packed' and shipment already assigned it correctly short-circuits. Consider requiring status in {paid, packed} explicitly before creating shipment.",
+    "server.py: admin_shiprocket_mock/real forces status to 'shipped' even though AWB is only 'Assigned' (not actually shipped). Consider setting status to 'shipped' only when actual courier scan happens; for now this matches product spec.",
+    "CORS_ORIGINS is '*' with allow_credentials=True — starlette will effectively disable credentialed CORS for wildcard. httpOnly cookie may not be sent cross-origin. Bearer token fallback works so login still functions, but tighten origins in production.",
+    "Frontend Checkout uses window.location redirect for order-success — fine. React key warning should be fixed."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100%", "frontend": "95%"},
+  "test_credentials": "Admin: sandhuxe@gmail.com / SweetOClock@123 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Created a few TEST_ orders and one TEST_UIProduct during testing; TEST_UIProduct cleaned up. TEST_ orders left in DB for main agent inspection (they are marked with TEST_ prefix in customer.name).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All critical flows (storefront -> cart -> checkout -> mock pay -> success -> invoice -> track -> admin login -> product CRUD -> status update -> Shiprocket mock AWB -> resend invoice) are working end-to-end in mock mode. Only cosmetic issues remain: mobile overflow ~8px, rounded total display mismatch, React key warning in Checkout. Backend tests live at /app/backend/tests/backend_test.py and pass 16/16.",
+  "rca of the issue": "N/A — no functional failures. Cosmetic total mismatch stems from `Math.round`/`toFixed(0)` usage in UI while backend keeps 2-decimal precision."
+}

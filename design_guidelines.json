@@ -1,0 +1,138 @@
+{
+  "app_identity": {
+    "name": "SweetOClock",
+    "concept": "Haute Artisanal Indian Sweet Shop (Mithai Storefront & Admin)",
+    "archetype": "Organic & Earthy Warm Artisanal (Saffron, Pistachio, Ghee Gold, Rice Paper)",
+    "app_type": "e-commerce (food/sweets storefront + admin dashboard hybrid)"
+  },
+  "theme_strategy": {
+    "storefront_theme": "Warm Light Theme",
+    "admin_theme": "Clean Utilitarian High-Contrast",
+    "rationale": "Indian mithai requires rich, appetizing warm tones (saffron, ghee gold, pistachio green) with ivory rice-paper backgrounds. The admin panel utilizes a sleek modern slate dark/light contrast for data density."
+  },
+  "typography": {
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&display=swap",
+    "font_family_headings": "Cormorant Garamond, Playfair Display, serif",
+    "font_family_body": "Outfit, system-ui, sans-serif",
+    "font_family_mono": "Consolas, Monaco, monospace",
+    "headline_rules": "Use font-serif tracking-tight with warm terracotta or dark charcoal color. Never use generic Inter for titles.",
+    "hierarchy": {
+      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-stone-900 leading-tight",
+      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-serif font-semibold text-stone-900 tracking-tight",
+      "h3_card_title": "text-xl sm:text-2xl font-serif font-bold text-stone-800",
+      "body_text": "text-base font-sans text-stone-600 leading-relaxed",
+      "price_tag": "text-lg sm:text-xl font-sans font-bold text-amber-900"
+    }
+  },
+  "color_palette": {
+    "rice_paper_bg": "#FAF6F0",
+    "card_bg": "#FFFFFF",
+    "warm_charcoal": "#1C1917",
+    "saffron_primary": "#9A3412",
+    "saffron_hover": "#7C2D12",
+    "ghee_gold_accent": "#D97706",
+    "ghee_gold_light": "#FEF3C7",
+    "pistachio_green": "#065F46",
+    "pistachio_light": "#D1FAE5",
+    "border_warm": "#E7E5E4",
+    "admin": {
+      "bg": "#F8FAFC",
+      "sidebar_bg": "#0F172A",
+      "sidebar_text": "#F8FAFC",
+      "status_paid": "#DCFCE7",
+      "status_packed": "#FEF3C7",
+      "status_shipped": "#E0F2FE",
+      "status_delivered": "#D1FAE5"
+    }
+  },
+  "layout_and_components": {
+    "header_nav": {
+      "style": "Sticky header with backdrop blur bg-[#FAF6F0]/85 border-b border-amber-900/10 z-50",
+      "elements": "Brand logo with golden sweet icon, Navigation links (Our Mithai, Process & Purity, Order Tracking), Cart Button with badge counter, Admin Portal switch"
+    },
+    "hero_section": {
+      "layout": "Asymmetric 2-column grid (Mode A Tetris pattern)",
+      "left_content": "Artisanal badge, Handcrafted Laddoo & Khajur Fudge headline, Per-kg pricing callout, Quick Add buttons, Pure Desi Ghee guarantee pill",
+      "right_content": "Hero image container with rounded-2xl overflow, subtle saffron halo blur background glow, organic floating detail card"
+    },
+    "products_section": {
+      "layout": "Responsive Bento grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
+      "product_card_style": "bg-white border border-stone-200 hover:border-amber-400 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 relative flex flex-col justify-between",
+      "featured_products": [
+        {
+          "name": "Besan & Gond Laddoo",
+          "price": "₹599/kg",
+          "price_val": 599,
+          "tag": "Best Seller",
+          "desc": "Slow-roasted gram flour in 100% pure Desi Ghee, studded with crunchy almonds & edible gum.",
+          "image": "https://images.unsplash.com/photo-1635952346904-95f2ccfcd029?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85"
+        },
+        {
+          "name": "Royal Khajur & Dry Fruit Fudge",
+          "price": "₹899/kg",
+          "price_val": 899,
+          "tag": "Sugar Free Choice",
+          "desc": "Rich dates crushed with premium pistachios, cashews, and saffron strands. Zero added refined sugar.",
+          "image": "https://images.unsplash.com/photo-1610432589024-5f02f76549cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85"
+        },
+        {
+          "name": "Shahi Royal Assorted Box",
+          "price": "₹1,299/kg",
+          "price_val": 1299,
+          "tag": "Gift Edition",
+          "desc": "Curated selection of hand-rolled Laddoos, Date Fudges, and Kaju Katli wrapped in gold-foiled artisanal box.",
+          "image": "https://images.unsplash.com/photo-1652595802737-56d08ad31f09?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85"
+        }
+      ]
+    },
+    "weight_selector": "Interactive weight chip buttons: 250g (0.25x), 500g (0.5x), 1kg (1x), 2kg (2x) with auto-calculated live total",
+    "cart_drawer": "Slide-over right panel with item quantities, weight breakdown, subtotal, GST, delivery fee, and Express Guest Checkout button",
+    "guest_checkout": {
+      "form_fields": ["Full Name", "Phone Number", "Delivery Address", "Pincode", "City"],
+      "payment_options": "Razorpay Mock / Integration trigger + UPI / Card simulation",
+      "flow": "No login required. Direct instant purchase."
+    },
+    "order_tracking": {
+      "inputs": "Phone Number + Order ID search",
+      "visual_timeline": "4-stage status tracker (Placed -> Paid -> Packed -> Shipped -> Delivered) with Shiprocket AWBS / Courier detail pill"
+    },
+    "admin_dashboard": {
+      "sidebar": "Dark slate (#0F172A) with logo, Products CRUD tab, Orders Management tab, Analytics summary",
+      "order_management": "Table view with customer name, phone, address, total amount, payment status (Razorpay ID), order status dropdown (Paid, Packed, Shipped, Delivered), Actions (Push to Shiprocket, Resend Invoice PDF)"
+    }
+  },
+  "media_assets": {
+    "hero_laddoo_img": "https://images.unsplash.com/photo-1635952346904-95f2ccfcd029?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85",
+    "khajur_fudge_img": "https://images.unsplash.com/photo-1610432589024-5f02f76549cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85",
+    "assorted_box_img": "https://images.unsplash.com/photo-1652595802737-56d08ad31f09?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85"
+  },
+  "testing_and_data_ids": {
+    "mandatory_rule": "All buttons, inputs, links, cards, tabs, and status badges MUST include data-testid",
+    "examples": {
+      "nav_cart_btn": "data-testid=\"nav-cart-btn\"",
+      "nav_track_btn": "data-testid=\"nav-track-btn\"",
+      "product_card": "data-testid=\"product-card-{id}\"",
+      "weight_chip": "data-testid=\"weight-select-{grams}\"",
+      "add_to_cart": "data-testid=\"add-to-cart-btn-{id}\"",
+      "checkout_name_input": "data-testid=\"checkout-name-input\"",
+      "checkout_phone_input": "data-testid=\"checkout-phone-input\"",
+      "checkout_address_input": "data-testid=\"checkout-address-input\"",
+      "pay_razorpay_btn": "data-testid=\"pay-razorpay-btn\"",
+      "download_invoice_btn": "data-testid=\"download-invoice-btn\"",
+      "track_search_submit": "data-testid=\"track-search-submit\"",
+      "admin_status_select": "data-testid=\"admin-status-select-{orderId}\"",
+      "admin_shiprocket_push": "data-testid=\"admin-shiprocket-push-{orderId}\"",
+      "admin_invoice_resend": "data-testid=\"admin-invoice-resend-{orderId}\""
+    }
+  },
+  "instructions_to_main_agent": [
+    "Import Cormorant Garamond & Outfit fonts into public/index.html or index.css for authentic mithai aesthetic.",
+    "Ensure background color `#FAF6F0` is applied on storefront body for warm paper texture feel.",
+    "Implement guest checkout without enforcing login or registration.",
+    "Include Razorpay payment simulation modal/trigger with transaction ID generation.",
+    "Provide downloadable HTML/PDF order invoice generator upon checkout completion and in admin panel.",
+    "Build Order Tracking tool that allows users to view order status by entering Order ID + Phone number.",
+    "In Admin Panel, allow state transitions (Paid -> Packed -> Shipped -> Delivered) and Shiprocket push simulation with tracking ID generation.",
+    "Ensure all interactive elements have data-testid attributes attached."
+  ]
+}
