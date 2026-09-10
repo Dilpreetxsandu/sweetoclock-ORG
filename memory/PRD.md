@@ -15,6 +15,11 @@ Online sweets ordering web app: storefront (Laddoo ₹599/kg, Khajur Fudge ₹89
 ## Core Requirements (static)
 - Per-kg pricing, no stock display, free delivery, prepaid only, single admin role, single pickup (440001), orders identified by phone + order ID.
 
+## Implemented (2026-09-10)
+- Storefront reskinned to user's own design (sweetoclock-single-file.html, applied as-is): centered header "Sweet'O Clock / Est. 1987 · Nagpur / No.001 — Winter Edit", hero with user's banner image + English/Hindi taglines, 6-product grid, "Kind words" customer reviews section (3 reviews), footer with dynamic basket status. Arial type, #f8f8f8 header/footer, #ddd bordered cards.
+- Catalog replaced with the design's 6 products (Kaju Katli ₹499, Motichoor Ladoo ₹349, Gulab Jamun ₹299, Rasgulla ₹249, Jalebi ₹199, Besan Barfi ₹279 — per kg, with user's product images). Old Laddoo/Khajur Fudge seeds removed.
+- Cart/checkout/tracking/admin all re-verified working against the new design (6 product cards, 3 review cards render; weight chips + add-to-basket functional).
+
 ## Implemented (2026-09-09)
 - Storefront with warm mithai aesthetic (Cormorant Garamond/Outfit, saffron/ghee-gold palette), hero, product grid, weight chips, cart drawer.
 - Guest checkout → Razorpay (mock mode) → server-side verify → order confirmation + PDF invoice download.

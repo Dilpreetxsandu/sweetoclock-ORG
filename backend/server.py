@@ -59,18 +59,46 @@ ORDER_STATUSES = ["created", "paid", "packed", "shipped", "delivered"]
 
 SEED_PRODUCTS = [
     {
-        "name": "Laddoo",
-        "description": "Slow-roasted gram flour folded into 100% pure desi ghee, studded with crunchy almonds, cashews and green cardamom.",
-        "price_per_kg": 599,
-        "image_url": "https://images.unsplash.com/photo-1635952346904-95f2ccfcd029?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBmb29kJTIwZGVzc2VydHxlbnwwfHx8fDE3ODg5NTI1MTN8MA&ixlib=rb-4.1.0&q=85",
+        "name": "Kaju Katli",
+        "description": "Silky cashew fudge cut into classic diamonds, finished with edible silver leaf.",
+        "price_per_kg": 499,
+        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/6c394dccf5585c73123459c0b5a8c2c82ade2293ad6b9a40369a5e7705833c30.jpeg",
+        "tag": "",
+    },
+    {
+        "name": "Motichoor Ladoo",
+        "description": "Fine boondi pearls bound in pure desi ghee, hand-rolled every dawn.",
+        "price_per_kg": 349,
+        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/5dd8bf2b0d8b4d0af3c9c71652aa312c443e7d0f6076773de07d8c40f39ca5b8.jpeg",
         "tag": "Best Seller",
     },
     {
-        "name": "Khajur Fudge",
-        "description": "Rich dates crushed with premium pistachios, cashews and saffron strands. Zero added refined sugar.",
-        "price_per_kg": 899,
-        "image_url": "https://images.unsplash.com/photo-1638537691693-e830a13f0016?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHw0fHxkYXRlcyUyMGZ1ZGdlJTIwa2hhanVyJTIwYnVyZmklMjBpbmRpYW4lMjBzd2VldHxlbnwwfHx8fDE3ODg5NTI1NDJ8MA&ixlib=rb-4.1.0&q=85",
-        "tag": "Sugar Free",
+        "name": "Gulab Jamun",
+        "description": "Khoya dumplings soaked in warm cardamom-rose syrup.",
+        "price_per_kg": 299,
+        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/b6a3394fb1e1e0751965f7ea195c7397238517d23f33a83aec8d4f93ad459104.jpeg",
+        "tag": "",
+    },
+    {
+        "name": "Rasgulla",
+        "description": "Feather-light chhena balls simmered in delicate sugar syrup.",
+        "price_per_kg": 249,
+        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/d8408e7ef7a26838c618bfb51d76589d28c85128c02c4445fd93b39338fc99c6.jpeg",
+        "tag": "",
+    },
+    {
+        "name": "Jalebi",
+        "description": "Crisp saffron spirals, fried to order and dipped in syrup.",
+        "price_per_kg": 199,
+        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/aa1c8cf99a6626edb99ea5cb7e78d6d6b5c9cf5ee1698f0268154187d573403b.jpeg",
+        "tag": "",
+    },
+    {
+        "name": "Besan Barfi",
+        "description": "Slow-roasted gram flour fudge with ghee and cardamom.",
+        "price_per_kg": 279,
+        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/f617a213f837fe58c4090f35ec4089d0e995ae5dd41a3cf7762c37d8904719c8.jpeg",
+        "tag": "",
     },
 ]
 

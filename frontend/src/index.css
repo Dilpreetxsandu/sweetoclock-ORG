@@ -6,8 +6,8 @@
 
 body {
     margin: 0;
-    font-family: 'Outfit', system-ui, sans-serif;
-    background-color: #FAF6F0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #ffffff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
