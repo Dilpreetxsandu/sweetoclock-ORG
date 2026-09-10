@@ -15,7 +15,13 @@ Online sweets ordering web app: storefront (Laddoo ₹599/kg, Khajur Fudge ₹89
 ## Core Requirements (static)
 - Per-kg pricing, no stock display, free delivery, prepaid only, single admin role, single pickup (440001), orders identified by phone + order ID.
 
-## Implemented (2026-09-10)
+## Implemented (2026-09-10, v2 — GitHub design port)
+- Storefront replaced with user's own GitHub design (github.com/Dilpreetxsandu/sweetoclock1), applied as-is: editorial pastel theme (matcha/cream/butter, Fraunces/Manrope/Instrument Serif), fixed nav + mobile menu, hero parallax with line-rise animation + stats bar, marquee, offers carousel, horizontal product scroller with category filters, manifesto chapters, two-row auto-scrolling "Kind words" reviews reel, footer with WhatsApp CTA. Product detail pages (gallery, about, ingredients, qty, suggestions), design-styled checkout (pincode auto city/state lookup + phone field), Razorpay-style payment panel, track page, success screens.
+- Backend switched to per-UNIT pricing to match design: 8 seeded products (Kaju Katli ₹499/500g box, Motichoor Ladoo ₹349, Gulab Jamun ₹299, Rasgulla ₹249, Jalebi ₹199, Besan Barfi ₹279, Dry-Fruit Laddu ₹499/1kg, Festive Hamper ₹899) with full PDP data (gallery/about/ingredients/ratings). Order items {product_id, qty}; delivery free ≥ ₹799 else ₹79; invoice PDF unit-based.
+- Admin product CRUD updated to new fields (name, price, unit, image, category, badge, tagline).
+- Testing: 13/13 backend pytest + 100% frontend E2E passed (iteration_2.json), zero bugs; mobile overflow resolved.
+
+## Implemented (2026-09-10, v1 — superseded by v2)
 - Storefront reskinned to user's own design (sweetoclock-single-file.html, applied as-is): centered header "Sweet'O Clock / Est. 1987 · Nagpur / No.001 — Winter Edit", hero with user's banner image + English/Hindi taglines, 6-product grid, "Kind words" customer reviews section (3 reviews), footer with dynamic basket status. Arial type, #f8f8f8 header/footer, #ddd bordered cards.
 - Catalog replaced with the design's 6 products (Kaju Katli ₹499, Motichoor Ladoo ₹349, Gulab Jamun ₹299, Rasgulla ₹249, Jalebi ₹199, Besan Barfi ₹279 — per kg, with user's product images). Old Laddoo/Khajur Fudge seeds removed.
 - Cart/checkout/tracking/admin all re-verified working against the new design (6 product cards, 3 review cards render; weight chips + add-to-basket functional).

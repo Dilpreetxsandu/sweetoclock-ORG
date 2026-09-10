@@ -12,7 +12,7 @@ const STATUS_COLORS = {
   delivered: "bg-emerald-100 text-emerald-800",
 };
 const STATUSES = ["paid", "packed", "shipped", "delivered"];
-const emptyProduct = { name: "", description: "", price_per_kg: "", image_url: "", tag: "", active: true };
+const emptyProduct = { name: "", tagline: "", price: "", unit: "500g", image: "", category: "Signature", badge: "", active: true };
 
 function ProductForm({ initial, onSave, onCancel, saving }) {
   const [form, setForm] = useState(initial);
@@ -22,7 +22,7 @@ function ProductForm({ initial, onSave, onCancel, saving }) {
       data-testid="product-form"
       onSubmit={(e) => {
         e.preventDefault();
-        onSave({ ...form, price_per_kg: parseFloat(form.price_per_kg) });
+        onSave({ ...form, price: parseFloat(form.price), badge: form.badge || null });
       }}
       className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-6 sm:grid-cols-2"
     >
@@ -30,21 +30,31 @@ function ProductForm({ initial, onSave, onCancel, saving }) {
         <label className="mb-1 block text-xs font-semibold text-slate-500">Name</label>
         <input data-testid="product-name-input" required value={form.name} onChange={set("name")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" />
       </div>
-      <div>
-        <label className="mb-1 block text-xs font-semibold text-slate-500">Price per kg (₹)</label>
-        <input data-testid="product-price-input" required type="number" min="1" value={form.price_per_kg} onChange={set("price_per_kg")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-slate-500">Price (₹)</label>
+          <input data-testid="product-price-input" required type="number" min="1" value={form.price} onChange={set("price")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-slate-500">Unit</label>
+          <input data-testid="product-unit-input" value={form.unit} onChange={set("unit")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" placeholder="500g box" />
+        </div>
       </div>
       <div className="sm:col-span-2">
         <label className="mb-1 block text-xs font-semibold text-slate-500">Image URL</label>
-        <input data-testid="product-image-input" value={form.image_url} onChange={set("image_url")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" placeholder="https://…" />
+        <input data-testid="product-image-input" value={form.image} onChange={set("image")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" placeholder="https://…" />
       </div>
       <div>
-        <label className="mb-1 block text-xs font-semibold text-slate-500">Tag (optional)</label>
-        <input data-testid="product-tag-input" value={form.tag} onChange={set("tag")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" placeholder="Best Seller" />
+        <label className="mb-1 block text-xs font-semibold text-slate-500">Category</label>
+        <input data-testid="product-category-input" value={form.category} onChange={set("category")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" placeholder="Signature" />
       </div>
       <div>
-        <label className="mb-1 block text-xs font-semibold text-slate-500">Description</label>
-        <input data-testid="product-desc-input" value={form.description} onChange={set("description")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" />
+        <label className="mb-1 block text-xs font-semibold text-slate-500">Badge (optional)</label>
+        <input data-testid="product-badge-input" value={form.badge || ""} onChange={set("badge")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" placeholder="Best Seller" />
+      </div>
+      <div className="sm:col-span-2">
+        <label className="mb-1 block text-xs font-semibold text-slate-500">Tagline</label>
+        <input data-testid="product-tagline-input" value={form.tagline} onChange={set("tagline")} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500" />
       </div>
       <div className="flex gap-3 sm:col-span-2">
         <button data-testid="product-save-btn" disabled={saving} className="flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-slate-950 hover:bg-amber-400 disabled:opacity-60">
@@ -301,12 +311,12 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((p) => (
                 <div key={p.id} className="rounded-2xl border border-slate-200 bg-white p-4" data-testid={`admin-product-card-${p.id}`}>
-                  <img src={p.image_url} alt={p.name} className="mb-3 h-36 w-full rounded-xl object-cover" />
+                  <img src={p.image} alt={p.name} className="mb-3 h-36 w-full rounded-xl object-cover" />
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-serif text-lg font-bold text-slate-900">{p.name}</p>
-                      <p className="text-sm font-bold text-amber-700">₹{p.price_per_kg}/kg</p>
-                      {p.tag && <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">{p.tag}</span>}
+                      <p className="text-sm font-bold text-amber-700">₹{p.price} / {p.unit}</p>
+                      {p.badge && <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">{p.badge}</span>}
                     </div>
                     <div className="flex gap-1">
                       <button data-testid={`product-edit-${p.id}`} onClick={() => setEditing(p)} className="rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800">

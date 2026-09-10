@@ -6,6 +6,7 @@ load_dotenv(Path(__file__).parent / ".env")
 import asyncio
 import logging
 import os
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
@@ -56,49 +57,155 @@ INVOICE_DIR = Path(__file__).parent / "invoices"
 INVOICE_DIR.mkdir(exist_ok=True)
 
 ORDER_STATUSES = ["created", "paid", "packed", "shipped", "delivered"]
+FREE_DELIVERY_OVER = 799.0
+DELIVERY_FEE = 79.0
+
+GEN = "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/"
 
 SEED_PRODUCTS = [
     {
-        "name": "Kaju Katli",
-        "description": "Silky cashew fudge cut into classic diamonds, finished with edible silver leaf.",
-        "price_per_kg": 499,
-        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/6c394dccf5585c73123459c0b5a8c2c82ade2293ad6b9a40369a5e7705833c30.jpeg",
-        "tag": "",
+        "slug": "kaju-katli", "name": "Kaju Katli",
+        "tagline": "Silver-leafed cashew diamonds, slow-set with saffron.",
+        "category": "Signature", "price": 499, "compare_at": 599, "unit": "500g box",
+        "rating": 4.9, "reviews": 312, "badge": "Signature",
+        "image": GEN + "6c394dccf5585c73123459c0b5a8c2c82ade2293ad6b9a40369a5e7705833c30.jpeg",
+        "gallery": [
+            GEN + "6c394dccf5585c73123459c0b5a8c2c82ade2293ad6b9a40369a5e7705833c30.jpeg",
+            GEN + "af57329b813181c6ddd63e18450b9744833ec084eb4f7675d54cc17c6fd32397.jpeg",
+            GEN + "1afd96815e49632bc02208b0b418c115b56e3ed254ca8a4dbd532f374de23fb7.jpeg",
+            GEN + "db256d3acb8d924545ee09d16286913eeeacc6b7e6819ecaec8f4b7ece1fbfed.jpeg",
+        ],
+        "about": [
+            "Our Kaju Katli begins with whole Vengurla cashews, stone-ground into a silk-fine paste and cooked low over bilona ghee until it turns to a glossy fudge. A breath of Kashmiri saffron rounds it out — never essence, never colour.",
+            "Each diamond is hand-cut, then finished with edible silver vark laid on by hand. Thin, delicate, melt-on-the-tongue. This is the one our regulars gift at every wedding and Diwali.",
+        ],
+        "ingredients": ["Cashew", "A2 Bilona Ghee", "Saffron", "Cane Sugar", "Silver Vark"],
     },
     {
-        "name": "Motichoor Ladoo",
-        "description": "Fine boondi pearls bound in pure desi ghee, hand-rolled every dawn.",
-        "price_per_kg": 349,
-        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/5dd8bf2b0d8b4d0af3c9c71652aa312c443e7d0f6076773de07d8c40f39ca5b8.jpeg",
-        "tag": "Best Seller",
+        "slug": "motichoor-ladoo", "name": "Motichoor Ladoo",
+        "tagline": "Boondi pearls bound in warm ghee and pistachio dust.",
+        "category": "Ladoo", "price": 349, "compare_at": 420, "unit": "500g",
+        "rating": 4.9, "reviews": 302, "badge": "Best Seller",
+        "image": GEN + "5dd8bf2b0d8b4d0af3c9c71652aa312c443e7d0f6076773de07d8c40f39ca5b8.jpeg",
+        "gallery": [
+            GEN + "5dd8bf2b0d8b4d0af3c9c71652aa312c443e7d0f6076773de07d8c40f39ca5b8.jpeg",
+            GEN + "bc1c867edf9d9eb2700199267c74af6247493a918e683618571bba860ebe0c8f.jpeg",
+            GEN + "28449217e85fdc3647c024aff3dfe253b19ee67063f2b6a8123fe431be8f669b.jpeg",
+            GEN + "b866ceb1b9645b8aa86ae770cd8d27d61a8d61b70573fcfe632dd0b8bca91d17.jpeg",
+        ],
+        "about": [
+            "Tiny boondi pearls are fried in small batches, soaked in a light cardamom syrup, then pressed together by hand while still warm so every ladoo stays soft to the centre.",
+            "We dust each one with slivered Iranian pistachio. Fragrant, golden, and gone far too quickly — our most-ordered sweet, three years running.",
+        ],
+        "ingredients": ["Gram Flour", "A2 Bilona Ghee", "Cardamom", "Pistachio", "Cane Sugar"],
     },
     {
-        "name": "Gulab Jamun",
-        "description": "Khoya dumplings soaked in warm cardamom-rose syrup.",
-        "price_per_kg": 299,
-        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/b6a3394fb1e1e0751965f7ea195c7397238517d23f33a83aec8d4f93ad459104.jpeg",
-        "tag": "",
+        "slug": "gulab-jamun", "name": "Gulab Jamun",
+        "tagline": "Khoya orbs steeped in rose and green cardamom syrup.",
+        "category": "Milk", "price": 299, "compare_at": None, "unit": "500g",
+        "rating": 4.8, "reviews": 214, "badge": None,
+        "image": GEN + "b6a3394fb1e1e0751965f7ea195c7397238517d23f33a83aec8d4f93ad459104.jpeg",
+        "gallery": [
+            GEN + "b6a3394fb1e1e0751965f7ea195c7397238517d23f33a83aec8d4f93ad459104.jpeg",
+            GEN + "301ccd7a3ec8598956148ec625905c56f29241fd191bc62845cf9efa15461bd5.jpeg",
+            GEN + "cef7d55dc09486f5cb823e3445f02f9208c5f0d529f93fe9a3e8a10618bf0b23.jpeg",
+            GEN + "fcc737d2e0a080d3e34f714f04a2db29107b5489df2d8928d9aec6178687e59c.jpeg",
+        ],
+        "about": [
+            "Fresh khoya is kneaded soft, rolled into orbs and fried slow to a deep amber. They rest overnight in a rose-and-green-cardamom syrup so the sweetness soaks all the way through.",
+            "Warm them for ten seconds and they turn pillowy — the way your grandmother served them, straight from the pan.",
+        ],
+        "ingredients": ["Khoya", "Rose Water", "Green Cardamom", "Cane Sugar", "A2 Ghee"],
     },
     {
-        "name": "Rasgulla",
-        "description": "Feather-light chhena balls simmered in delicate sugar syrup.",
-        "price_per_kg": 249,
-        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/d8408e7ef7a26838c618bfb51d76589d28c85128c02c4445fd93b39338fc99c6.jpeg",
-        "tag": "",
+        "slug": "rasgulla", "name": "Rasgulla",
+        "tagline": "Feather-light chhena spheres in a whisper of syrup.",
+        "category": "Milk", "price": 249, "compare_at": None, "unit": "500g",
+        "rating": 4.9, "reviews": 156, "badge": None,
+        "image": GEN + "d8408e7ef7a26838c618bfb51d76589d28c85128c02c4445fd93b39338fc99c6.jpeg",
+        "gallery": [
+            GEN + "d8408e7ef7a26838c618bfb51d76589d28c85128c02c4445fd93b39338fc99c6.jpeg",
+            GEN + "e8b56fbce75a4842e3dc451c53b5356d4706fb1609d769bc92f43f350b7a2084.jpeg",
+            GEN + "cbe543d62996ead1ea6701bf2607b026f7194f09f37d2285866db64dedaf7b5f.jpeg",
+            GEN + "c0fad9d821dacb0a01ff8b913684d8b79d2893f3329a3a79f425f431de75926d.jpeg",
+        ],
+        "about": [
+            "Hand-strained chhena is kneaded until silken, shaped into spheres and simmered in a light sugar syrup until they double and turn spongy.",
+            "Barely sweet, endlessly light — chill them and serve cold. A Bengali classic done the honest way.",
+        ],
+        "ingredients": ["Fresh Chhena", "Cane Sugar", "Rose Water", "Cardamom"],
     },
     {
-        "name": "Jalebi",
-        "description": "Crisp saffron spirals, fried to order and dipped in syrup.",
-        "price_per_kg": 199,
-        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/aa1c8cf99a6626edb99ea5cb7e78d6d6b5c9cf5ee1698f0268154187d573403b.jpeg",
-        "tag": "",
+        "slug": "jalebi", "name": "Jalebi",
+        "tagline": "Crisp saffron spirals fried and dipped at sunset.",
+        "category": "Crispy", "price": 199, "compare_at": None, "unit": "250g",
+        "rating": 4.7, "reviews": 89, "badge": "New",
+        "image": GEN + "aa1c8cf99a6626edb99ea5cb7e78d6d6b5c9cf5ee1698f0268154187d573403b.jpeg",
+        "gallery": [
+            GEN + "aa1c8cf99a6626edb99ea5cb7e78d6d6b5c9cf5ee1698f0268154187d573403b.jpeg",
+            GEN + "d4e708f3ef179821496c0742b7e71bfc937107c09d4af82b7917caaad3703574.jpeg",
+            GEN + "6cecfae25caa637fe88be03e2716d6eda751c62c91d8e82bf232c111be2738c3.jpeg",
+            GEN + "8049afcb4166eefe28fd18b4421a21072b55b69982e4010cde6b4653da750004.jpeg",
+        ],
+        "about": [
+            "A fermented batter is piped into spirals and fried till glass-crisp, then dipped in warm saffron syrup so it crackles on the first bite and dissolves on the second.",
+            "We fry to order in the evenings — best eaten the day it's made, ideally with a cup of chai.",
+        ],
+        "ingredients": ["Fermented Batter", "Saffron", "Cane Sugar", "Ghee"],
     },
     {
-        "name": "Besan Barfi",
-        "description": "Slow-roasted gram flour fudge with ghee and cardamom.",
-        "price_per_kg": 279,
-        "image_url": "https://static.prod-images.emergentagent.com/jobs/7e3f0152-49d7-49d6-9fea-0836246843ac/images/f617a213f837fe58c4090f35ec4089d0e995ae5dd41a3cf7762c37d8904719c8.jpeg",
-        "tag": "",
+        "slug": "besan-barfi", "name": "Besan Barfi",
+        "tagline": "Gram flour, desi ghee, saffron — slow-toasted for hours.",
+        "category": "Barfi", "price": 279, "compare_at": None, "unit": "250g",
+        "rating": 4.6, "reviews": 66, "badge": None,
+        "image": GEN + "f617a213f837fe58c4090f35ec4089d0e995ae5dd41a3cf7762c37d8904719c8.jpeg",
+        "gallery": [
+            GEN + "f617a213f837fe58c4090f35ec4089d0e995ae5dd41a3cf7762c37d8904719c8.jpeg",
+            GEN + "af15de793e4b72baf1bec064ec29eb470ba2637920cd54a180352e4337e22362.jpeg",
+            GEN + "fe1841c67f0099e9e33dc1c41a6a64dd255b472715790673e89e132d9358123a.jpeg",
+            GEN + "2cf09fc20a8d49c85ad607382afc2c9a2b67e18d140e9812aebeeeec1821ff14.jpeg",
+        ],
+        "about": [
+            "Coarse gram flour is toasted in ghee for the better part of an hour — this is the step no one wants to rush and the one that makes all the difference. The kitchen smells of roasted nuts long before it's set.",
+            "Cut into squares and finished with saffron and pistachio. Grainy, rich, deeply nostalgic.",
+        ],
+        "ingredients": ["Gram Flour", "A2 Bilona Ghee", "Saffron", "Pistachio", "Cane Sugar"],
+    },
+    {
+        "slug": "dry-fruit-laddu", "name": "Dry-Fruit Laddu",
+        "tagline": "Almond, cashew, date, and a whisper of jaggery.",
+        "category": "Ladoo", "price": 499, "compare_at": 599, "unit": "1kg",
+        "rating": 4.8, "reviews": 127, "badge": "Premium",
+        "image": GEN + "586b1403a53403e9775ec40a6e89c0239c7e53d476916c9f33e272a42149cfed.jpeg",
+        "gallery": [
+            GEN + "586b1403a53403e9775ec40a6e89c0239c7e53d476916c9f33e272a42149cfed.jpeg",
+            GEN + "f382a6c9ebe04e9e31f36e949749cd165224882ac45c6d97f98dc2e9c087158e.jpeg",
+            GEN + "b344ef5cbd7d56d459b24e2b3960ce5f0a98fcf7076824e25d9cbc599f2d9be1.jpeg",
+            GEN + "48f9bc76c5217726a4371ae43b47b1c826382a02af42fc1d57b13218d9dd6527.jpeg",
+        ],
+        "about": [
+            "No sugar, no khoya — just roasted almonds, cashews and dates, bound with a touch of jaggery and ghee. Every laddu is packed with whole nuts you can see and feel.",
+            "The one we recommend to new parents, athletes, and anyone who wants something wholesome that still tastes like a treat.",
+        ],
+        "ingredients": ["Almond", "Cashew", "Dates", "Jaggery", "A2 Ghee"],
+    },
+    {
+        "slug": "festive-hamper", "name": "Festive Hamper",
+        "tagline": "Six premium mithais in a hand-finished wooden case.",
+        "category": "Gift Box", "price": 899, "compare_at": 1100, "unit": "wooden box",
+        "rating": 5.0, "reviews": 74, "badge": "Gift",
+        "image": GEN + "1794143f4787f1b2d16b4c91ac2aa34b7f5a7566140ad75104d7bef4af34090c.jpeg",
+        "gallery": [
+            GEN + "1794143f4787f1b2d16b4c91ac2aa34b7f5a7566140ad75104d7bef4af34090c.jpeg",
+            GEN + "2f6e11d892d20023177065d0b76cef8008e1e8f2019a6bcd292c3647eda3f23e.jpeg",
+            GEN + "e9be08c7000c6dc5dd53f0b8e925744a055323e45e1389a2066a7f12f2901519.jpeg",
+            GEN + "1ca21499605159978870e722142548ff50e5975d59b1caccc87ec96cac499ef3.jpeg",
+        ],
+        "about": [
+            "Our best-loved sweets arranged in a hand-finished wooden case — Kaju Katli, Motichoor Ladoo, Besan Barfi, Dry-Fruit Laddu and two seasonal picks, all made the morning it ships.",
+            "Comes with a handwritten note of your choosing. The gift people remember long after the box is empty — weddings, Diwali, corporate, all sorted.",
+        ],
+        "ingredients": ["Assorted Mithai", "A2 Bilona Ghee", "Saffron", "Mixed Nuts", "Wooden Case"],
     },
 ]
 
@@ -117,7 +224,6 @@ class Customer(BaseModel):
 
 class CartItem(BaseModel):
     product_id: str
-    weight_grams: int
     qty: int = 1
 
 
@@ -140,10 +246,19 @@ class LoginRequest(BaseModel):
 
 class ProductIn(BaseModel):
     name: str
-    description: str = ""
-    price_per_kg: float
-    image_url: str = ""
-    tag: str = ""
+    slug: str = ""
+    tagline: str = ""
+    category: str = "Signature"
+    price: float
+    compare_at: Optional[float] = None
+    unit: str = "500g"
+    rating: float = 4.8
+    reviews: int = 0
+    badge: Optional[str] = None
+    image: str = ""
+    gallery: List[str] = []
+    about: List[str] = []
+    ingredients: List[str] = []
     active: bool = True
 
 
@@ -159,6 +274,10 @@ def now_iso() -> str:
 
 def gen_order_number() -> str:
     return "SOC-" + uuid.uuid4().hex[:6].upper()
+
+
+def slugify(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 def hash_password(password: str) -> str:
@@ -205,7 +324,7 @@ def generate_invoice_pdf(order: dict) -> Path:
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("helvetica", "B", 22)
-    pdf.cell(0, 12, "SweetOClock", ln=True)
+    pdf.cell(0, 12, "Sweet'O Clock", ln=True)
     pdf.set_font("helvetica", "", 10)
     pdf.cell(0, 6, "Handcrafted Indian Mithai - Nagpur, Maharashtra 440001", ln=True)
     pdf.ln(6)
@@ -218,26 +337,28 @@ def generate_invoice_pdf(order: dict) -> Path:
     pdf.multi_cell(0, 6, f"Deliver to: {c['address']}, {c['city']}, {c['state']} - {c['pincode']}")
     pdf.ln(4)
     pdf.set_font("helvetica", "B", 10)
-    pdf.cell(80, 8, "Item", border=1)
-    pdf.cell(30, 8, "Weight", border=1)
+    pdf.cell(90, 8, "Item", border=1)
     pdf.cell(20, 8, "Qty", border=1)
-    pdf.cell(30, 8, "Rate/kg", border=1)
-    pdf.cell(30, 8, "Amount", border=1, ln=True)
+    pdf.cell(40, 8, "Rate", border=1)
+    pdf.cell(40, 8, "Amount", border=1, ln=True)
     pdf.set_font("helvetica", "", 10)
     for it in order["items"]:
-        pdf.cell(80, 8, it["name"][:38], border=1)
-        pdf.cell(30, 8, f"{it['weight_grams']}g", border=1)
+        pdf.cell(90, 8, f"{it['name'][:36]} ({it.get('unit', '')})", border=1)
         pdf.cell(20, 8, str(it["qty"]), border=1)
-        pdf.cell(30, 8, f"Rs. {it['price_per_kg']:.0f}", border=1)
-        pdf.cell(30, 8, f"Rs. {it['line_total']:.2f}", border=1, ln=True)
+        pdf.cell(40, 8, f"Rs. {it['price']:.0f}", border=1)
+        pdf.cell(40, 8, f"Rs. {it['line_total']:.2f}", border=1, ln=True)
+    pdf.cell(150, 8, "Subtotal", border=1)
+    pdf.cell(40, 8, f"Rs. {order['subtotal']:.2f}", border=1, ln=True)
+    pdf.cell(150, 8, "Delivery", border=1)
+    pdf.cell(40, 8, "Free" if order["delivery_fee"] == 0 else f"Rs. {order['delivery_fee']:.2f}", border=1, ln=True)
     pdf.set_font("helvetica", "B", 11)
-    pdf.cell(160, 8, "Total (Free Delivery)", border=1)
-    pdf.cell(30, 8, f"Rs. {order['total']:.2f}", border=1, ln=True)
+    pdf.cell(150, 8, "Total", border=1)
+    pdf.cell(40, 8, f"Rs. {order['total']:.2f}", border=1, ln=True)
     pdf.ln(6)
     pdf.set_font("helvetica", "I", 9)
     pay = order.get("payment") or {}
     pdf.cell(0, 6, f"Payment: Prepaid via Razorpay  {pay.get('razorpay_payment_id', '')}", ln=True)
-    pdf.cell(0, 6, "Thank you for ordering with SweetOClock!", ln=True)
+    pdf.cell(0, 6, "Thank you for ordering with Sweet'O Clock!", ln=True)
     path = INVOICE_DIR / f"{order['order_number']}.pdf"
     pdf.output(str(path))
     return path
@@ -257,7 +378,7 @@ async def send_invoice_whatsapp(order: dict, invoice_url: str) -> str:
         if not to.startswith("+"):
             to = "+91" + to.lstrip("0")
         body = (
-            f"SweetOClock order {order['order_number']} confirmed! "
+            f"Sweet'O Clock order {order['order_number']} confirmed! "
             f"Total Rs. {order['total']:.2f}. Download your invoice: {invoice_url}"
         )
         tc.messages.create(from_=f"whatsapp:{TWILIO_FROM}", to=f"whatsapp:{to}", body=body)
@@ -320,8 +441,7 @@ async def sr_request(method: str, path: str, **kwargs) -> dict:
 
 @api_router.get("/products")
 async def list_products():
-    products = await db.products.find({"active": True}, {"_id": 0}).to_list(100)
-    return products
+    return await db.products.find({"active": True}, {"_id": 0}).to_list(100)
 
 
 # ---------- Public: Orders / Payment ----------
@@ -336,21 +456,21 @@ async def create_order(req: CreateOrderRequest):
         product = await db.products.find_one({"id": ci.product_id, "active": True}, {"_id": 0})
         if not product:
             raise HTTPException(400, f"Product not found: {ci.product_id}")
-        if ci.weight_grams not in (250, 500, 1000, 2000):
-            raise HTTPException(400, "Invalid weight option")
         if ci.qty < 1 or ci.qty > 50:
             raise HTTPException(400, "Invalid quantity")
-        line_total = round(product["price_per_kg"] * ci.weight_grams / 1000 * ci.qty, 2)
+        line_total = round(product["price"] * ci.qty, 2)
         subtotal += line_total
         items.append({
             "product_id": product["id"],
             "name": product["name"],
-            "price_per_kg": product["price_per_kg"],
-            "weight_grams": ci.weight_grams,
+            "price": product["price"],
+            "unit": product.get("unit", ""),
             "qty": ci.qty,
             "line_total": line_total,
         })
-    total = round(subtotal, 2)
+    subtotal = round(subtotal, 2)
+    delivery_fee = 0.0 if subtotal >= FREE_DELIVERY_OVER else DELIVERY_FEE
+    total = round(subtotal + delivery_fee, 2)
     order_id = str(uuid.uuid4())
     order_number = gen_order_number()
 
@@ -375,7 +495,7 @@ async def create_order(req: CreateOrderRequest):
         "customer": req.customer.model_dump(),
         "items": items,
         "subtotal": subtotal,
-        "delivery_fee": 0.0,
+        "delivery_fee": delivery_fee,
         "total": total,
         "status": "created",
         "payment": {"razorpay_order_id": razorpay_order_id, "mock": RAZORPAY_MOCK},
@@ -518,6 +638,9 @@ async def admin_list_products(admin: dict = Depends(get_admin)):
 async def admin_create_product(p: ProductIn, admin: dict = Depends(get_admin)):
     doc = p.model_dump()
     doc["id"] = str(uuid.uuid4())
+    doc["slug"] = doc["slug"] or slugify(doc["name"])
+    if not doc["gallery"] and doc["image"]:
+        doc["gallery"] = [doc["image"]]
     doc["created_at"] = now_iso()
     await db.products.insert_one(doc)
     doc.pop("_id", None)
@@ -526,7 +649,9 @@ async def admin_create_product(p: ProductIn, admin: dict = Depends(get_admin)):
 
 @api_router.put("/admin/products/{product_id}")
 async def admin_update_product(product_id: str, p: ProductIn, admin: dict = Depends(get_admin)):
-    result = await db.products.update_one({"id": product_id}, {"$set": p.model_dump()})
+    doc = p.model_dump()
+    doc["slug"] = doc["slug"] or slugify(doc["name"])
+    result = await db.products.update_one({"id": product_id}, {"$set": doc})
     if result.matched_count == 0:
         raise HTTPException(404, "Product not found")
     return await db.products.find_one({"id": product_id}, {"_id": 0})
@@ -544,8 +669,7 @@ async def admin_delete_product(product_id: str, admin: dict = Depends(get_admin)
 
 @api_router.get("/admin/orders")
 async def admin_list_orders(admin: dict = Depends(get_admin)):
-    orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
-    return orders
+    return await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
 
 
 @api_router.patch("/admin/orders/{order_id}/status")
@@ -568,7 +692,7 @@ async def admin_push_shiprocket(order_id: str, admin: dict = Depends(get_admin))
     if order.get("shipment") and order["shipment"].get("awb"):
         return order["shipment"]
 
-    total_weight = max(sum(i["weight_grams"] * i["qty"] for i in order["items"]) / 1000.0, 0.5)
+    total_weight = max(sum(i["qty"] for i in order["items"]) * 0.5, 0.5)
 
     if SHIPROCKET_MOCK:
         shipment = {
@@ -600,7 +724,7 @@ async def admin_push_shiprocket(order_id: str, admin: dict = Depends(get_admin))
             "length": 20, "breadth": 15, "height": 10,
             "weight": total_weight,
             "order_items": [
-                {"name": i["name"], "sku": i["product_id"][:12], "units": i["qty"], "selling_price": i["line_total"] / i["qty"]}
+                {"name": i["name"], "sku": i["product_id"][:12], "units": i["qty"], "selling_price": i["price"]}
                 for i in order["items"]
             ],
         }
@@ -639,7 +763,7 @@ async def admin_resend_invoice(order_id: str, request: Request, admin: dict = De
 
 @api_router.get("/")
 async def root():
-    return {"message": "SweetOClock API"}
+    return {"message": "Sweet'O Clock API"}
 
 
 app.include_router(api_router)
@@ -670,7 +794,7 @@ async def startup():
     elif not verify_password(ADMIN_PASSWORD, existing["password_hash"]):
         await db.admins.update_one({"email": ADMIN_EMAIL}, {"$set": {"password_hash": hash_password(ADMIN_PASSWORD)}})
     for sp in SEED_PRODUCTS:
-        found = await db.products.find_one({"name": sp["name"]})
+        found = await db.products.find_one({"slug": sp["slug"]})
         if not found:
             doc = dict(sp)
             doc.update({"id": str(uuid.uuid4()), "active": True, "created_at": now_iso()})

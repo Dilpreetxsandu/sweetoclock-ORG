@@ -1,0 +1,31 @@
+{
+  "summary": "Round 2 full-stack testing for SweetOClock after migration to unit-based pricing + new GitHub design. Rewrote backend_test.py for new model (product schema: name/price/unit/image/category/badge/tagline; order items {product_id, qty}; delivery_fee 0>=₹799 else ₹79). Backend: 13/13 pytest tests PASSED (products list has all 8 seeds, order create+verify (2x Kaju Katli ₹998 free delivery), invalid signature rejected, delivery fee ₹79 under threshold (1x Jalebi ₹199+79=278), invalid qty rejected, empty cart rejected, track order (correct+wrong phone), invoice PDF (200 application/pdf), admin auth (login/me/bearer/cookie), admin order list, admin product CRUD, admin status update, mock Shiprocket AWB (MOCK…), resend invoice pdf_fallback). Frontend: storefront loads with 8 product cards; category filter Ladoo→2 cards works; add-to-cart from card works; cart drawer shows subtotal ₹499 / delivery ₹79 / total ₹578; checkout form works (pincode 440001 auto-filled city=Nagpur/state=Maharashtra via api.postalpincode.in); payment page renders, UPI method selectable, Pay button auto-verifies in mock mode; success screen displays SOC-89A4ED order number, itemised total (Kaju Katli ×1 ₹499 + Delivery ₹79 = Paid via Razorpay ₹578), Download invoice + Track your order buttons visible. Track page finds paid order with correct phone, shows error on wrong phone. Admin login (sandhuxe@gmail.com / SweetOClock@123) works, redirects to /admin, new order SOC-89A4ED visible in orders list, Orders/Products tabs present. Mobile 390x844: previous ~8px horizontal overflow is FIXED (scrollWidth==clientWidth==390), all 8 product cards render, hero + fonts render correctly.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py: CORS_ORIGINS='*' with allow_credentials=True — Starlette silently disables credentialed CORS for wildcard. httpOnly cookie won't be sent cross-origin from a different domain; Bearer token fallback is what keeps admin auth working. Tighten to explicit origin list for production.",
+    "server.py admin_push_shiprocket: forces order status to 'shipped' when only AWB is 'Assigned'. Consider a distinct status 'awb_assigned' or leave as 'packed' until an actual courier scan is received.",
+    "server.py admin_push_shiprocket: allows push when status in {paid, packed, shipped, delivered}. Consider whitelisting {paid, packed} explicitly rather than only blocking 'created'.",
+    "server.py: no rate limiting on /auth/login → brute-force possible. Add throttling / lockout after N failed attempts (playbook expectation).",
+    "server.py has grown to 808 lines with all responsibilities in one file; consider splitting into routers/services/models modules (>700-line guideline).",
+    "Frontend hero uses SplitText animation which visually splits the headline into multiple spans — accessible text is still present in DOM, fine, but screen-reader UX could be reviewed.",
+    "Admin login button is a plain <button> without type='submit' — pressing Enter in the password field may not submit the form; only the Sign In click works. Minor UX."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% of critical flows"},
+  "test_credentials": "Admin: sandhuxe@gmail.com / SweetOClock@123 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Created TEST_ prefixed orders and one TEST_UnitProd product (deleted after CRUD test). Real end-to-end order SOC-89A4ED (Kaju Katli x1 ₹578) left in DB for main-agent inspection.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend tests fully aligned with unit-based schema — reuse /app/backend/tests/backend_test.py. All previous iteration_1 UI issues (mobile overflow, total rounding, React key warning) are visually resolved — mobile has zero horizontal overflow now and success screen shows exact ₹578. Razorpay/Twilio/Shiprocket remain in mock mode by design. Pincode 440001 auto-fills via api.postalpincode.in successfully during the test.",
+  "rca of the issue": "N/A — no functional failures found this round."
+}

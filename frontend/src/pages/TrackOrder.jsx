@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Check, Loader2, Package, PackageCheck, PackageSearch, Truck, Home } from "lucide-react";
-import { api, formatApiError, inr } from "@/api";
-import StoreHeader from "@/components/StoreHeader";
-import CartDrawer from "@/components/CartDrawer";
+import { api, API, formatApiError } from "@/api";
+import { IconArrowRight, IconArrowUpRight } from "@/components/Icons";
 
 const STEPS = [
-  { key: "paid", label: "Paid", icon: PackageCheck },
-  { key: "packed", label: "Packed", icon: Package },
-  { key: "shipped", label: "Shipped", icon: Truck },
-  { key: "delivered", label: "Delivered", icon: Home },
+  { key: "paid", label: "Paid" },
+  { key: "packed", label: "Packed" },
+  { key: "shipped", label: "Shipped" },
+  { key: "delivered", label: "Delivered" },
 ];
 
 export default function TrackOrder() {
@@ -36,74 +34,68 @@ export default function TrackOrder() {
   const currentIdx = order ? STEPS.findIndex((s) => s.key === order.status) : -1;
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0]">
-      <StoreHeader />
-      <CartDrawer />
-      <main className="mx-auto max-w-2xl px-4 py-14 sm:px-6">
-        <h1 className="font-serif text-3xl font-bold text-stone-900 sm:text-4xl">Track Your Order</h1>
-        <p className="mt-2 text-sm text-stone-500">Enter your Order ID (e.g. SOC-AB12CD) and the phone number used at checkout.</p>
+    <main className="pdp-bg">
+      <div className="co-top section-inner" style={{ maxWidth: 720 }}>
+        <span className="sticker"><span className="dot" /> Order tracking</span>
+        <h1 className="co-heading">Where's my <span className="italic-olive">mithai?</span></h1>
 
-        <form onSubmit={search} className="mt-8 space-y-4 rounded-2xl border border-stone-200 bg-white p-6" data-testid="track-form">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-stone-500">Order ID</label>
-            <input data-testid="track-order-id-input" required value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-full rounded-xl border border-stone-300 bg-[#FAF6F0] px-4 py-2.5 text-sm outline-none focus:border-[#9A3412]" placeholder="SOC-XXXXXX" />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-stone-500">Phone Number</label>
-            <input data-testid="track-phone-input" required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-stone-300 bg-[#FAF6F0] px-4 py-2.5 text-sm outline-none focus:border-[#9A3412]" placeholder="9876543210" />
-          </div>
-          <button data-testid="track-search-submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-full bg-[#9A3412] py-3 text-sm font-bold text-[#FAF6F0] transition-colors hover:bg-[#7C2D12] disabled:opacity-60">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <PackageSearch className="h-4 w-4" />}
-            Track Order
-          </button>
-        </form>
-
-        {error && <p className="mt-6 rounded-xl bg-red-50 p-4 text-center text-sm text-red-700" data-testid="track-error">{error}</p>}
+        <div className="co-card">
+          <h2 className="co-card-title">Track your order</h2>
+          <form onSubmit={search} data-testid="track-form">
+            <label className="field">
+              <span className="field-label">Order ID</span>
+              <input value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} placeholder="SOC-XXXXXX" data-testid="track-order-id-input" required />
+            </label>
+            <label className="field">
+              <span className="field-label">Phone number</span>
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="10-digit mobile used at checkout" data-testid="track-phone-input" required />
+            </label>
+            <button type="submit" className="btn-pill btn-ink co-continue-btn" disabled={loading} data-testid="track-search-submit">
+              {loading ? "Searching…" : "Track order"} <IconArrowRight />
+            </button>
+          </form>
+          {error && <p className="pin-hint err" style={{ marginTop: 12 }} data-testid="track-error">{error}</p>}
+        </div>
 
         {order && (
-          <div className="fade-up mt-8 rounded-2xl border border-stone-200 bg-white p-6" data-testid="track-result">
-            <div className="mb-6 flex items-center justify-between">
+          <div className="co-card" style={{ marginTop: 24 }} data-testid="track-result">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
               <div>
-                <p className="font-mono text-lg font-bold text-[#9A3412]">{order.order_number}</p>
-                <p className="text-xs text-stone-500">Placed on {order.created_at.slice(0, 10)} · {inr(order.total)}</p>
+                <div className="edition-tag" style={{ display: "block" }}>{order.order_number}</div>
+                <div className="cart-drawer-title">Placed {order.created_at.slice(0, 10)} · ₹{order.total}</div>
               </div>
-              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase text-amber-900" data-testid="track-status-badge">
-                {order.status}
-              </span>
+              <span className="sticker" data-testid="track-status-badge">{order.status}</span>
             </div>
 
             {order.status === "created" ? (
-              <p className="text-sm text-stone-500">Awaiting payment confirmation.</p>
+              <p style={{ marginTop: 16, color: "var(--ink-soft)", fontSize: 14 }}>Awaiting payment confirmation.</p>
             ) : (
-              <div className="flex items-center">
-                {STEPS.map((s, idx) => {
-                  const done = idx <= currentIdx;
-                  return (
-                    <div key={s.key} className="flex flex-1 items-center last:flex-none">
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${done ? "border-[#9A3412] bg-[#9A3412] text-white" : "border-stone-300 text-stone-400"}`} data-testid={`track-step-${s.key}`}>
-                          {done ? <Check className="h-5 w-5" /> : <s.icon className="h-5 w-5" />}
-                        </span>
-                        <span className={`text-[11px] font-semibold ${done ? "text-stone-800" : "text-stone-400"}`}>{s.label}</span>
-                      </div>
-                      {idx < STEPS.length - 1 && <div className={`mx-1 mb-5 h-0.5 flex-1 ${idx < currentIdx ? "bg-[#9A3412]" : "bg-stone-200"}`} />}
-                    </div>
-                  );
-                })}
+              <div className="co-steps" style={{ marginTop: 24, marginBottom: 0 }}>
+                {STEPS.map((s, idx) => (
+                  <span key={s.key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className={`co-step${idx <= currentIdx ? " done" : ""}`} data-testid={`track-step-${s.key}`}>
+                      <span className="num">{idx + 1}</span> {s.label}
+                    </span>
+                    {idx < STEPS.length - 1 && <span className="co-step-sep" />}
+                  </span>
+                ))}
               </div>
             )}
 
             {order.shipment?.awb && (
-              <div className="mt-6 rounded-xl bg-sky-50 p-4 text-sm" data-testid="track-shipment-info">
-                <p className="font-semibold text-sky-900">
-                  Courier: {order.shipment.courier || "Shiprocket"} · AWB: <span className="font-mono">{order.shipment.awb}</span>
-                </p>
-                {order.shipment.last_status && <p className="mt-1 text-xs text-sky-700">Latest: {order.shipment.last_status}</p>}
+              <div className="checkout-summary-box" style={{ marginTop: 20 }} data-testid="track-shipment-info">
+                <div className="row"><span>Courier</span><span>{order.shipment.courier || "Shiprocket"}</span></div>
+                <div className="row"><span>AWB</span><span style={{ fontFamily: "monospace" }}>{order.shipment.awb}</span></div>
+                {order.shipment.last_status && <div className="row"><span>Latest</span><span>{order.shipment.last_status}</span></div>}
               </div>
             )}
+
+            <a href={`${API}/orders/${order.id}/invoice`} className="btn-pill btn-outline" style={{ marginTop: 20 }} data-testid="track-invoice-link">
+              Download invoice <IconArrowUpRight />
+            </a>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

@@ -1,88 +1,90 @@
 import { useNavigate } from "react-router-dom";
-import { X, Minus, Plus, Trash2, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { inr } from "@/api";
+import { IconClose, IconTrash, IconArrowRight } from "@/components/Icons";
 
-export default function CartDrawer() {
-  const { items, updateQty, removeItem, subtotal, drawerOpen, setDrawerOpen } = useCart();
+export const CartDrawer = () => {
+  const { cart, count, subtotal, delivery, total, cartOpen, closeCart, setQty, removeFromCart } = useCart();
   const navigate = useNavigate();
 
-  if (!drawerOpen) return null;
+  const goToCheckout = () => {
+    closeCart();
+    navigate("/checkout");
+  };
 
   return (
-    <div className="fixed inset-0 z-[60]" data-testid="cart-drawer">
-      <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-[#FAF6F0] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-stone-200 px-6 py-4">
-          <h2 className="font-serif text-2xl font-bold text-stone-900">Your Basket</h2>
-          <button data-testid="cart-close-btn" onClick={() => setDrawerOpen(false)} className="rounded-full p-2 text-stone-500 transition-colors hover:bg-stone-200">
-            <X className="h-5 w-5" />
+    <>
+      <div
+        className={`cart-backdrop${cartOpen ? " show" : " hidden"}`}
+        onClick={closeCart}
+        data-testid="cart-backdrop"
+      />
+      <aside className={`cart-drawer${cartOpen ? " open" : " closed"}`} data-testid="cart-drawer">
+        <div className="cart-drawer-header">
+          <div>
+            <div className="edition-tag" style={{ display: "block" }}>Your basket</div>
+            <div className="cart-drawer-title" data-testid="cart-item-count-label">
+              {count} {count === 1 ? "item" : "items"}
+            </div>
+          </div>
+          <button className="qty-btn qty-btn-lg" aria-label="Close cart" onClick={closeCart} data-testid="close-cart-btn">
+            <IconClose />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          {items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-stone-400">
-              <ShoppingBasket className="h-12 w-12" />
-              <p className="text-sm">Your basket is empty. Mithai awaits!</p>
+        <div className="cart-items no-scrollbar">
+          {cart.length === 0 ? (
+            <div className="empty-cart" data-testid="empty-cart">
+              <div className="empty-cart-title">Your basket is empty.</div>
+              <p className="empty-cart-copy">Something sweet is waiting on the shelf.</p>
+              <button className="btn-pill btn-ink" onClick={closeCart}>
+                Browse sweets <IconArrowRight />
+              </button>
             </div>
           ) : (
-            <ul className="space-y-4">
-              {items.map((item) => {
-                const line = (item.price_per_kg * item.weight_grams * item.qty) / 1000;
-                return (
-                  <li key={item.key} data-testid={`cart-item-${item.key}`} className="flex gap-4 rounded-2xl border border-stone-200 bg-white p-3">
-                    <img src={item.image_url} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
-                    <div className="flex flex-1 flex-col justify-between">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="font-serif text-lg font-bold leading-tight text-stone-800">{item.name}</p>
-                          <p className="text-xs text-stone-500">{item.weight_grams}g pack</p>
-                        </div>
-                        <button data-testid={`cart-remove-${item.key}`} onClick={() => removeItem(item.key)} className="text-stone-400 transition-colors hover:text-red-600">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 rounded-full border border-stone-200 px-1 py-0.5">
-                          <button data-testid={`cart-minus-${item.key}`} onClick={() => updateQty(item.key, -1)} className="rounded-full p-1 hover:bg-stone-100">
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="w-5 text-center text-sm font-semibold">{item.qty}</span>
-                          <button data-testid={`cart-plus-${item.key}`} onClick={() => updateQty(item.key, 1)} className="rounded-full p-1 hover:bg-stone-100">
-                            <Plus className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <p className="text-sm font-bold text-amber-900">{inr(line)}</p>
-                      </div>
+            cart.map((it) => (
+              <div className="cart-item" key={it.id} data-testid={`cart-item-${it.slug}`}>
+                <img className="cart-item-img" src={it.image} alt={it.name} />
+                <div className="cart-item-info">
+                  <div className="cart-item-top">
+                    <div>
+                      <div className="cart-item-name">{it.name}</div>
+                      <div className="cart-item-unit">{it.unit}</div>
                     </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    <button className="remove-btn" aria-label="Remove" onClick={() => removeFromCart(it.id)} data-testid={`remove-${it.slug}`}>
+                      <IconTrash />
+                    </button>
+                  </div>
+                  <div className="cart-item-bottom">
+                    <div className="qty-controls">
+                      <button className="qty-btn" onClick={() => setQty(it.id, it.quantity - 1)} data-testid={`qty-dec-${it.slug}`}>−</button>
+                      <span className="qty-value">{it.quantity}</span>
+                      <button className="qty-btn" onClick={() => setQty(it.id, it.quantity + 1)} data-testid={`qty-inc-${it.slug}`}>+</button>
+                    </div>
+                    <div className="cart-item-price">₹{it.price * it.quantity}</div>
+                  </div>
+                </div>
+              </div>
+            ))
           )}
         </div>
 
-        {items.length > 0 && (
-          <div className="border-t border-stone-200 bg-white px-6 py-5">
-            <div className="mb-1 flex items-center justify-between text-sm text-stone-600">
-              <span>Subtotal</span>
-              <span data-testid="cart-subtotal" className="font-bold text-stone-900">{inr(subtotal)}</span>
+        {cart.length > 0 && (
+          <div className="cart-summary">
+            <div className="cart-summary-row"><span>Subtotal</span><span data-testid="cart-subtotal">₹{subtotal}</span></div>
+            <div className="cart-summary-row">
+              <span>Delivery{subtotal >= 799 ? <em style={{ fontStyle: "italic" }}> (free)</em> : ""}</span>
+              <span>{delivery === 0 ? "—" : `₹${delivery}`}</span>
             </div>
-            <p className="mb-4 text-xs text-emerald-700">Free delivery across India</p>
-            <button
-              data-testid="cart-checkout-btn"
-              onClick={() => {
-                setDrawerOpen(false);
-                navigate("/checkout");
-              }}
-              className="w-full rounded-full bg-[#9A3412] py-3 text-sm font-bold text-[#FAF6F0] transition-colors hover:bg-[#7C2D12]"
-            >
-              Guest Checkout →
+            <div className="cart-summary-total">
+              <span className="edition-tag" style={{ display: "block" }}>Total</span>
+              <span className="cart-total-amount" data-testid="cart-total">₹{total}</span>
+            </div>
+            <button className="btn-pill btn-ink cart-checkout-btn" onClick={goToCheckout} data-testid="checkout-btn">
+              Checkout <IconArrowRight />
             </button>
           </div>
         )}
       </aside>
-    </div>
+    </>
   );
-}
+};
