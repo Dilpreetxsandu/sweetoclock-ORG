@@ -15,6 +15,10 @@ Online sweets ordering web app: storefront (Laddoo ₹599/kg, Khajur Fudge ₹89
 ## Core Requirements (static)
 - Per-kg pricing, no stock display, free delivery, prepaid only, single admin role, single pickup (440001), orders identified by phone + order ID.
 
+## Implemented (2026-09-15 — real product photos, 2-product catalog)
+- Catalog reduced to the user's two real products with their professional photos (uploaded zips, optimized 1600px/80q → /app/frontend/public/products/): Laddoo ₹599/kg (5-photo gallery, Best Seller) and Khajur Fudge ₹899/kg (4-photo gallery, Sugar Free). All other seeded products removed.
+- Offers carousel updated to feature Laddoo + Khajur Fudge with real photos.
+
 ## Implemented (2026-09-10, v2 — GitHub design port)
 - Storefront replaced with user's own GitHub design (github.com/Dilpreetxsandu/sweetoclock1), applied as-is: editorial pastel theme (matcha/cream/butter, Fraunces/Manrope/Instrument Serif), fixed nav + mobile menu, hero parallax with line-rise animation + stats bar, marquee, offers carousel, horizontal product scroller with category filters, manifesto chapters, two-row auto-scrolling "Kind words" reviews reel, footer with WhatsApp CTA. Product detail pages (gallery, about, ingredients, qty, suggestions), design-styled checkout (pincode auto city/state lookup + phone field), Razorpay-style payment panel, track page, success screens.
 - Backend switched to per-UNIT pricing to match design: 8 seeded products (Kaju Katli ₹499/500g box, Motichoor Ladoo ₹349, Gulab Jamun ₹299, Rasgulla ₹249, Jalebi ₹199, Besan Barfi ₹279, Dry-Fruit Laddu ₹499/1kg, Festive Hamper ₹899) with full PDP data (gallery/about/ingredients/ratings). Order items {product_id, qty}; delivery free ≥ ₹799 else ₹79; invoice PDF unit-based.
