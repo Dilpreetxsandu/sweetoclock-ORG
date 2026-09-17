@@ -19,6 +19,7 @@ Online sweets ordering web app: storefront (Laddoo ₹599/kg, Khajur Fudge ₹89
 - Razorpay LIVE keys wired (rzp_live_…) — real payment orders verified (order_Td1FCKMBj9zMyf, ₹678 with delivery). Mock mode off for payments.
 - Shiprocket LIVE credentials wired — auth token verified against apiv2.shiprocket.in.
 - Twilio replaced by AiSensy per user choice (cheaper): backend wired to AiSensy API Campaign endpoint (template params [name, order_number, total] + invoice PDF media). PDF fallback until AISENSY_API_KEY is added.
+- Admin account rotated per user request: cosmosgreens2025@gmail.com / Cosmosgreen@EST1987 (old sandhuxe@gmail.com admin removed at startup; only env-configured admin exists).
 - PENDING from user: (1) Shiprocket pickup street address + contact phone (account has zero pickup locations — shipments can't be created until registered). (2) AiSensy: API key added 2026-09-15 and endpoint verified — blocked on user's WABA verification in AiSensy ("WABA is not verified"), then approve Utility template + set API campaign `order_confirmation` Live. PDF fallback active until then.
 
 ## Implemented (2026-09-15 — real product photos, 2-product catalog)

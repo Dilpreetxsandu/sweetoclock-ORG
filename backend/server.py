@@ -669,6 +669,7 @@ async def startup():
     await db.products.create_index("id", unique=True)
     await db.orders.create_index("id", unique=True)
     await db.orders.create_index("order_number", unique=True)
+    await db.admins.delete_many({"email": {"$ne": ADMIN_EMAIL}})
     existing = await db.admins.find_one({"email": ADMIN_EMAIL})
     if existing is None:
         await db.admins.insert_one({
