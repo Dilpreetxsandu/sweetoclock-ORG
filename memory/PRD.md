@@ -15,6 +15,12 @@ Online sweets ordering web app: storefront (Laddoo ₹599/kg, Khajur Fudge ₹89
 ## Core Requirements (static)
 - Per-kg pricing, no stock display, free delivery, prepaid only, single admin role, single pickup (440001), orders identified by phone + order ID.
 
+## Implemented (2026-09-15, v2 — live keys)
+- Razorpay LIVE keys wired (rzp_live_…) — real payment orders verified (order_Td1FCKMBj9zMyf, ₹678 with delivery). Mock mode off for payments.
+- Shiprocket LIVE credentials wired — auth token verified against apiv2.shiprocket.in.
+- Twilio replaced by AiSensy per user choice (cheaper): backend wired to AiSensy API Campaign endpoint (template params [name, order_number, total] + invoice PDF media). PDF fallback until AISENSY_API_KEY is added.
+- PENDING from user: Shiprocket pickup street address + contact phone (account has zero pickup locations — shipments can't be created until registered), AiSensy API key.
+
 ## Implemented (2026-09-15 — real product photos, 2-product catalog)
 - Catalog reduced to the user's two real products with their professional photos (uploaded zips, optimized 1600px/80q → /app/frontend/public/products/): Laddoo ₹599/kg (5-photo gallery, Best Seller) and Khajur Fudge ₹899/kg (4-photo gallery, Sugar Free). All other seeded products removed.
 - Offers carousel updated to feature Laddoo + Khajur Fudge with real photos.

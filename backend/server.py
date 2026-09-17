@@ -42,10 +42,10 @@ RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 RAZORPAY_MOCK = (not RAZORPAY_KEY_ID) or ("CHANGE_ME" in RAZORPAY_KEY_ID)
 rzp_client = None if RAZORPAY_MOCK else razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
-TWILIO_SID = os.environ.get("TWILIO_ACCOUNT_SID", "")
-TWILIO_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "")
-TWILIO_FROM = os.environ.get("TWILIO_WHATSAPP_FROM", "")
-TWILIO_MOCK = (not TWILIO_SID) or ("CHANGE_ME" in TWILIO_SID)
+AISENSY_API_KEY = os.environ.get("AISENSY_API_KEY", "")
+AISENSY_CAMPAIGN = os.environ.get("AISENSY_CAMPAIGN_NAME", "order_confirmation")
+WHATSAPP_MOCK = (not AISENSY_API_KEY) or ("CHANGE_ME" in AISENSY_API_KEY)
+AISENSY_URL = "https://backend.aisensy.com/campaign/t1/api/v2"
 
 SHIPROCKET_EMAIL = os.environ.get("SHIPROCKET_EMAIL", "")
 SHIPROCKET_PASSWORD = os.environ.get("SHIPROCKET_PASSWORD", "")
@@ -249,22 +249,27 @@ def generate_invoice_pdf(order: dict) -> Path:
 # ---------- WhatsApp (Twilio) ----------
 
 async def send_invoice_whatsapp(order: dict, invoice_url: str) -> str:
-    if TWILIO_MOCK:
-        logger.info("Twilio not configured - using PDF invoice fallback")
+    if WHATSAPP_MOCK:
+        logger.info("AiSensy not configured - using PDF invoice fallback")
         return "pdf_fallback"
     try:
-        from twilio.rest import Client as TwilioClient
-
-        tc = TwilioClient(TWILIO_SID, TWILIO_TOKEN)
-        to = order["customer"]["phone"].strip()
-        if not to.startswith("+"):
-            to = "+91" + to.lstrip("0")
-        body = (
-            f"Sweet'O Clock order {order['order_number']} confirmed! "
-            f"Total Rs. {order['total']:.2f}. Download your invoice: {invoice_url}"
-        )
-        tc.messages.create(from_=f"whatsapp:{TWILIO_FROM}", to=f"whatsapp:{to}", body=body)
-        return "whatsapp"
+        digits = re.sub(r"\D", "", order["customer"]["phone"])
+        destination = "+" + digits if digits.startswith("91") and len(digits) == 12 else "+91" + digits[-10:]
+        payload = {
+            "apiKey": AISENSY_API_KEY,
+            "campaignName": AISENSY_CAMPAIGN,
+            "destination": destination,
+            "userName": order["customer"]["name"],
+            "source": "website",
+            "media": {"url": invoice_url, "filename": f"invoice-{order['order_number']}.pdf"},
+            "templateParams": [order["customer"]["name"], order["order_number"], f"{order['total']:.2f}"],
+        }
+        async with httpx.AsyncClient(timeout=10) as http:
+            resp = await http.post(AISENSY_URL, json=payload)
+        if resp.status_code == 200:
+            return "whatsapp"
+        logger.warning(f"AiSensy send failed ({resp.status_code}), PDF fallback")
+        return "pdf_fallback"
     except Exception as e:
         logger.warning(f"WhatsApp send failed, PDF fallback: {e}")
         return "pdf_fallback"

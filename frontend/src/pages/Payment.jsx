@@ -214,7 +214,7 @@ export default function Payment() {
               <div className="rzp-secure">Secured by Razorpay · 256-bit encryption</div>
 
               <div className="rzp-demo-note" data-testid="rzp-demo-note">
-                Demo mode — no real payment is processed yet. Live Razorpay keys go in the server environment to accept real payments.
+                Live payments — your card / UPI will be charged via Razorpay's secure gateway.
               </div>
             </div>
           </div>
