@@ -20,7 +20,7 @@ Online sweets ordering web app: storefront (Laddoo ₹599/kg, Khajur Fudge ₹89
 - Shiprocket LIVE credentials wired — auth token verified against apiv2.shiprocket.in.
 - Twilio replaced by AiSensy per user choice (cheaper): backend wired to AiSensy API Campaign endpoint (template params [name, order_number, total] + invoice PDF media). PDF fallback until AISENSY_API_KEY is added.
 - Admin account rotated per user request: cosmosgreens2025@gmail.com / Cosmosgreen@EST1987 (old sandhuxe@gmail.com admin removed at startup; only env-configured admin exists).
-- PENDING from user: (1) Shiprocket pickup street address + contact phone (account has zero pickup locations — shipments can't be created until registered). (2) AiSensy: API key added 2026-09-15 and endpoint verified — blocked on user's WABA verification in AiSensy ("WABA is not verified"), then approve Utility template + set API campaign `order_confirmation` Live. PDF fallback active until then.
+- PENDING from user: (1) Shiprocket pickup street address + contact phone (account has zero pickup locations — shipments can't be created until registered). (2) AiSensy: API key added 2026-09-15 and endpoint verified — WABA verified + paid plan activated (2026-09-18); now blocked on user creating the API campaign `order_confirmation` (Campaigns → Launch → API Campaign → approved template → Live). PDF fallback active until then.
 
 ## Implemented (2026-09-15 — real product photos, 2-product catalog)
 - Catalog reduced to the user's two real products with their professional photos (uploaded zips, optimized 1600px/80q → /app/frontend/public/products/): Laddoo ₹599/kg (5-photo gallery, Best Seller) and Khajur Fudge ₹899/kg (4-photo gallery, Sugar Free). All other seeded products removed.
