@@ -102,7 +102,7 @@ export default function Home() {
             <div className="stat"><span className="stat-num">4.9★</span><span className="stat-label">Google reviews</span></div>
             <div className="stat"><span className="stat-num">12,400+</span><span className="stat-label">Boxes delivered</span></div>
             <div className="stat"><span className="stat-num">₹0</span><span className="stat-label">Delivery over ₹799</span></div>
-            <span className="scroll-hint">scroll ↓</span>
+            <span className="scroll-hint" onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}>scroll ↓</span>
           </div>
         </div>
       </section>
